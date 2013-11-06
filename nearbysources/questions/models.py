@@ -21,7 +21,7 @@ class LocationOfInterest(models.Model):
     lat = models.FloatField()
     lng = models.FloatField()
     class Meta:
-        verbose_name_plural = "LocationsOfInterest"
+        verbose_name_plural = "Locations of interest"
     def __unicode__(self):
         return self.name
 
