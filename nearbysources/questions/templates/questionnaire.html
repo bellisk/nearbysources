@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+{% endblock %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+    <script type="text/javascript">
+        var question_ids = [{% for q in questions %}{{q.id}}, {% endfor %}];
+        var chosen_options = {};
+        function choose_option(q_id, o_id) {
+            chosen_options[q_id] = o_id;
+            var all_chosen = true;
+            question_ids.forEach(function(q) { all_chosen &= chosen_options[q] != undefined; });
+            if (all_chosen) {
+                var answers = question_ids.map(function(q) { return {question: q, option: chosen_options[q]}; });
+                $.ajax({
+                    url: "submit_response",
+                    type: "POST",
+                    data: {data: JSON.stringify({answers: answers})},
+                    success: function(data) {
+                        document.location.href = JSON.parse(data).redirect;
+                    }
+                });
+            }
+        }
+    </script>
+    <div id="intro">{{intro}}</div>
+    <div id="questions">
+        {% for q in questions %}
+            <div id="q_{{q.id}}" class="question">
+                <div class="questiontext">{{q.text}}</div>
+                <div class="options">
+                    {% for o in q.options %}
+                        <div id="o_{{o.id}}" class="option" onclick="choose_option({{q.id}}, {{o.id}})">{{o.text}}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

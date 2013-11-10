@@ -30,8 +30,29 @@ class Questionnaire(models.Model):
     def __unicode__(self):
         return self.name
 
+class QuestionnaireTweet(models.Model):
+    questionnaire = models.ForeignKey("Questionnaire", related_name="tweets")
+    language = models.ForeignKey("Language", related_name="+")
+    text = models.TextField()
+    def __unicode__(self):
+        return self.text[:80]
+
+class QuestionnaireTitle(models.Model):
+    questionnaire = models.ForeignKey("Questionnaire", related_name="titles")
+    language = models.ForeignKey("Language", related_name="+")
+    text = models.TextField()
+    def __unicode__(self):
+        return self.text[:80]
+
 class QuestionnaireIntro(models.Model):
     questionnaire = models.ForeignKey("Questionnaire", related_name="intros")
+    language = models.ForeignKey("Language", related_name="+")
+    text = models.TextField()
+    def __unicode__(self):
+        return self.text[:80]
+
+class QuestionnaireThankYou(models.Model):
+    questionnaire = models.ForeignKey("Questionnaire", related_name="thank_yous")
     language = models.ForeignKey("Language", related_name="+")
     text = models.TextField()
     def __unicode__(self):
@@ -65,9 +86,10 @@ class OptionText(models.Model):
 
 class Response(models.Model):
     questionnaire = models.ForeignKey("Questionnaire", related_name="responses")
+    location = models.ForeignKey("LocationOfInterest", related_name="responses")
     datetime = models.DateTimeField(auto_now_add=True)
     def summary(self):
-        return ", ".join(a.summary() for a in self.answers)
+        return ", ".join(a.summary() for a in self.answers.all())
     def __unicode__(self):
         return self.summary()[:80]
 

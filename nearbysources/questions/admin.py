@@ -5,17 +5,29 @@ admin.site.register(Language)
 admin.site.register(Campaign)
 admin.site.register(LocationOfInterest)
 
+class QuestionnaireTweetI(admin.TabularInline):
+    model = QuestionnaireTweet
+
+class QuestionnaireTitleI(admin.TabularInline):
+    model = QuestionnaireTitle
+
 class QuestionnaireIntroI(admin.TabularInline):
     model = QuestionnaireIntro
+
+class QuestionnaireThankYouI(admin.TabularInline):
+    model = QuestionnaireThankYou
 
 class QuestionI(admin.TabularInline):
     model = Question
 
 class QuestionnaireMA(admin.ModelAdmin):
-    inlines = [QuestionnaireIntroI, QuestionI]
+    inlines = [QuestionnaireTweetI, QuestionnaireTitleI, QuestionnaireIntroI, QuestionnaireThankYouI, QuestionI]
 
 admin.site.register(Questionnaire, QuestionnaireMA)
+admin.site.register(QuestionnaireTitle)
 admin.site.register(QuestionnaireIntro)
+admin.site.register(QuestionnaireTweet)
+admin.site.register(QuestionnaireThankYou)
 
 class QuestionTextI(admin.TabularInline):
     model = QuestionText
