@@ -3,7 +3,7 @@
     <head>
         {% block head %}{% endblock %}
         <title>{% block title %}{% endblock %}</title>
-        <style>
+        {% block style %}<style>
             body {
                 background-color: #cccccc;
                 font: 15pt Verdana;
@@ -76,7 +76,7 @@
             body {
                 font-size: 30pt;
             }
-        </style>
+        </style>{% endblock %}
     </head>
     <body>
         <div id="content">

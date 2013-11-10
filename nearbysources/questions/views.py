@@ -36,3 +36,16 @@ def submit_response(request, q_id, l_id, language):
 
 def thankyou(request, q_id, l_id, language):
     return render_to_response("thankyou.html", {"thankyou": go4(QuestionnaireThankYou, questionnaire=go4(Questionnaire, id=q_id), language=go4(Language, code=language)).text})
+
+def results(request, q_id, language):
+    q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    c = {}
+    c["name"] = q.name
+    c["headers"] = [
+        [["", 1], ["", 1]] + [[go4(QuestionText, question=question, language=lang).text, len(question.options.all())] for question in q.questions.order_by("name").all()],
+        [["Location", 1], ["Responses", 1]] + [[go4(OptionText, option=option, language=lang).text, 1] for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]
+    ]
+    c["data"] = [[loc.name, len(loc.responses.all())] + [str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 / len(Answer.objects.filter(response__location=loc, question=question))) + "%" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()] for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]
+    return render_to_response("results.html", c)
+    #return HttpResponse(json.dumps(c, indent=4))

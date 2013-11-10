@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Results for {{name}}{% endblock %}
+
+{% block style %}<style>
+    table {
+        border: 1px solid #aaaaaa;
+    }
+    th {
+        border-left: 1px solid #dddddd;
+        text-align: left;
+        padding-right: 10px;
+        margin: 0;
+    }
+    td {
+        border-top: 1px solid #bbbbbb;
+        border-left: 1px solid #dddddd;
+        padding-right: 10px;
+        text-align: right;
+    }
+</style>{% endblock %}
+
+{% block content %}
+    <table cellspacing="0">
+        {% for row in headers %}
+            <tr>
+            {% for cell in row %}
+                <th colspan="{{cell.1}}">{{cell.0}}</th>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        {% for row in data %}
+            <tr>
+            {% for cell in row %}
+                <td>{{cell}}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

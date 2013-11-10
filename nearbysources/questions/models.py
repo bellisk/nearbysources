@@ -11,12 +11,12 @@ class Language(models.Model):
 class Campaign(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=False)
-    questionnaire = models.OneToOneField("Questionnaire", related_name="+")
+    questionnaire = models.OneToOneField("Questionnaire", related_name="campaign")
     def __unicode__(self):
         return self.name
 
 class LocationOfInterest(models.Model):
-    campaign = models.ForeignKey("Campaign", related_name="locationsOfInterest")
+    campaign = models.ForeignKey("Campaign", related_name="locations")
     name = models.CharField(max_length=100)
     lat = models.FloatField()
     lng = models.FloatField()
