@@ -11,6 +11,8 @@
         var question_ids = [{% for q in questions %}{{q.id}}, {% endfor %}];
         var chosen_options = {};
         function choose_option(q_id, o_id) {
+            $('#q_' + q_id + ' .option').removeClass('selected').addClass('not_selected');
+            $('#o_' + o_id).addClass('selected').removeClass('not_selected');
             chosen_options[q_id] = o_id;
             var all_chosen = true;
             question_ids.forEach(function(q) { all_chosen &= chosen_options[q] != undefined; });
@@ -34,7 +36,7 @@
                 <div class="questiontext">{{q.text}}</div>
                 <div class="options">
                     {% for o in q.options %}
-                        <div id="o_{{o.id}}" class="option" onclick="choose_option({{q.id}}, {{o.id}})">{{o.text}}</div>
+                        <div id="o_{{o.id}}" class="option not_selected" onclick="choose_option({{q.id}}, {{o.id}})">{{o.text}}</div>
                     {% endfor %}
                 </div>
             </div>

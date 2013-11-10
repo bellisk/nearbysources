@@ -3,8 +3,79 @@
     <head>
         {% block head %}{% endblock %}
         <title>{% block title %}{% endblock %}</title>
+        <style>
+            body {
+                background-color: #cccccc;
+                font: 18px Verdana;
+                line-height: 130%;
+            }
+            #content {
+                width: 400px;
+                margin: auto;
+                background-color: white;
+                padding: 40px;
+            }
+
+            .questiontext {
+                margin-top: 30px;
+                margin-bottom: 15px;
+            }
+
+            .option {
+                cursor: pointer;
+                display: block;
+                margin-bottom: 15px;
+                background-color: #0000BB;
+                background: linear-gradient(to bottom, #0000DD, #0000AA);
+                color: white;
+                padding: 10px 40px 10px 40px;
+                border-radius: 5px;
+                border-top: 2px solid #0000FF;
+                border-left: 2px solid #0000EE;
+                border-right: 2px solid #0000AA;
+                border-bottom: 2px solid #000088;
+            }
+
+            .not_selected:hover {
+                background-color: #0000DD;
+                background: linear-gradient(to bottom, #0000FF, #0000CC);
+                border-top: 2px solid #2222FF;
+                border-left: 2px solid #1111FF;
+                border-right: 2px solid #0000CC;
+                border-bottom: 2px solid #0000AA;
+            }
+
+            .selected {
+                background-color: #00BB00;
+                background: linear-gradient(to bottom, #00DD00, #00AA00);
+                border-top: 2px solid #00FF00;
+                border-left: 2px solid #00EE00;
+                border-right: 2px solid #00AA00;
+                border-bottom: 2px solid #008800;
+            }
+
+            .selected:hover {
+                background-color: #00DD00;
+                background: linear-gradient(to bottom, #00FF00, #00CC00);
+                border-top: 2px solid #22FF22;
+                border-left: 2px solid #11FF11;
+                border-right: 2px solid #00CC00;
+                border-bottom: 2px solid #00AA00;
+            }
+
+            .selected:active, .not_selected:active {
+                background-color: #00FF00;
+                background: linear-gradient(to top, #00FF00, #00CC00);
+                border-top: 2px solid #22FF22;
+                border-left: 2px solid #11FF11;
+                border-right: 2px solid #00CC00;
+                border-bottom: 2px solid #00AA00;
+            }
+        </style>
     </head>
     <body>
-        {% block content %}{% endblock %}
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
     </body>
 </html>
