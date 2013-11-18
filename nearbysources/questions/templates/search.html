@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Search for {{query}}{% endblock %}
+
+{% block content %}
+    <div>
+        <a href="{% url "nearbysources.questions.views.frontpage" %}">NearbySources Home</a><br>
+        <a href="{% url "nearbysources.questions.views.info" q_id language %}">{{title}}</a>
+    </div>
+    <h1>Search for {{query}}</h1>
+    <div>
+        <form method="GET" action="search">
+            {% csrf_token %}
+            <input type="text" value="{{query}}" name="query">
+            <input type="submit" value="Search">
+        </form>
+    </div>
+    <div>
+        <ul>
+            {% for l in results %}
+                <li><a href="{% url "nearbysources.questions.views.questionnaire" q_id l.id language %}">{{l.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

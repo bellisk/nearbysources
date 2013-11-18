@@ -51,9 +51,11 @@ def info(request, q_id, language):
     
 def search(request, q_id, language):
     c = {}
-    c["q_id"] = q_id
-    c["language"] = language
     q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    c["q_id"] = q_id
+    c["title"] = go4(QuestionnaireTitle, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
+    c["language"] = language
     if "query" in request.GET:
         c["query"] = request.GET["query"]
         c["results"] = LocationOfInterest.objects.filter(campaign=q.campaign, name__icontains=request.GET["query"])

@@ -12,7 +12,7 @@
         <h3>Questionnaires</h3>
         <ul>
         {% for q in questionnaires %}
-            <li><a href="{% url nearbysources.questions.views.info q.id "en" %}">{{q.name}}</a></li>
+            <li><a href="{% url "nearbysources.questions.views.info" q.id "en" %}">{{q.name}}</a></li>
         {% endfor %}
         </ul>
     </div>

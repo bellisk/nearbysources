@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+    <div>
+        <a href="{% url "nearbysources.questions.views.frontpage" %}">NearbySources Home</a><br>
+    </div>
+    <h1>{{title}}</h1>
+    <div>
+        {{intro}}
+    </div>
+    <div>
+        <h3>Want to help?<br>Search locations of interest</h3>
+        <form action="search">
+            {% csrf_token %}
+            <input type="text" name="query">
+            <input type="submit" value="Search">
+        </form>
+    </div>
+{% endblock %}
