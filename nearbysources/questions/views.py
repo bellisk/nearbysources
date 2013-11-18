@@ -7,7 +7,9 @@ import json
 from django.http import HttpResponse
 
 def frontpage(request):
-    return render_to_response("frontpage.html")
+    c = {}
+    c["questionnaires"] = Questionnaire.objects.all()
+    return render_to_response("frontpage.html", c)
 
 def questionnaire(request, q_id, l_id, language):
     c = {}
@@ -37,6 +39,28 @@ def submit_response(request, q_id, l_id, language):
 def thankyou(request, q_id, l_id, language):
     return render_to_response("thankyou.html", {"thankyou": go4(QuestionnaireThankYou, questionnaire=go4(Questionnaire, id=q_id), language=go4(Language, code=language)).text})
 
+def info(request, q_id, language):
+    q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    c = {}
+    c["q_id"] = q_id
+    c["language"] = language
+    c["title"] = go4(QuestionnaireTitle, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
+    c["intro"] = go4(QuestionnaireIntro, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
+    return render_to_response("info.html", c)
+    
+def search(request, q_id, language):
+    c = {}
+    c["q_id"] = q_id
+    c["language"] = language
+    q = go4(Questionnaire, id=q_id)
+    if "query" in request.GET:
+        c["query"] = request.GET["query"]
+        c["results"] = LocationOfInterest.objects.filter(campaign=q.campaign, name__icontains=request.GET["query"])
+    else:
+        c["results"] = LocationOfInterest.objects.all()
+    return render_to_response("search.html", c)
+
 def results(request, q_id, language):
     q = go4(Questionnaire, id=q_id)
     lang = go4(Language, code=language)
@@ -48,4 +72,3 @@ def results(request, q_id, language):
     ]
     c["data"] = [[loc.name, len(loc.responses.all())] + [str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 / len(Answer.objects.filter(response__location=loc, question=question))) + "%" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()] for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]
     return render_to_response("results.html", c)
-    #return HttpResponse(json.dumps(c, indent=4))

@@ -8,4 +8,12 @@
         A project for crowdsourcing useful information by asking the people best placed to find it.<br>
         By David Stark, Rachel Knowler and Vincent van der Lubbe.
     </div>
+    <div>
+        <h3>Questionnaires</h3>
+        <ul>
+        {% for q in questionnaires %}
+            <li><a href="{% url nearbysources.questions.views.info q.id "en" %}">{{q.name}}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
