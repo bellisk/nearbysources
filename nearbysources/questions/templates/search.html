@@ -4,8 +4,8 @@
 
 {% block content %}
     <div>
-        <a href="{% url "nearbysources.questions.views.frontpage" %}">NearbySources Home</a><br>
-        <a href="{% url "nearbysources.questions.views.info" q_id language %}">{{title}}</a>
+        <a href="{% url "nearbysources.questions.views.frontpage" %}">&laquo; NearbySources Home</a><br>
+        <a href="{% url "nearbysources.questions.views.info" q_id language %}">&laquo; {{title}}</a>
     </div>
     <h1>Search for {{query}}</h1>
     <div>
