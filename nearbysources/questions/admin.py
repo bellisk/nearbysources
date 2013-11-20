@@ -58,3 +58,4 @@ class ResponseMA(admin.ModelAdmin):
 
 admin.site.register(Response, ResponseMA)
 admin.site.register(Answer)
+admin.site.register(TwitterRequest)

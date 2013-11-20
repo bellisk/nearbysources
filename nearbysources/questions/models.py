@@ -101,3 +101,11 @@ class Answer(models.Model):
         return str(self.question) + ": " + str(self.option)
     def __unicode__(self):
         return self.summary()[:80]
+
+class TwitterRequest(models.Model):
+    handle = models.CharField(max_length=20)
+    questionnaire = models.ForeignKey("Questionnaire", related_name="twitterrequests")
+    location = models.ForeignKey("LocationOfInterest", related_name="twitterrequests")
+    datetime = models.DateTimeField(auto_now_add=True)
+    def __unicode__(self):
+        return self.handle + " " + self.location.name
