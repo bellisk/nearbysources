@@ -14,6 +14,9 @@ class QuestionnaireTitleI(admin.TabularInline):
 class QuestionnaireIntroI(admin.TabularInline):
     model = QuestionnaireIntro
 
+class QuestionnaireMoreInfoI(admin.TabularInline):
+    model = QuestionnaireMoreInfo
+
 class QuestionnaireThankYouI(admin.TabularInline):
     model = QuestionnaireThankYou
 
@@ -21,11 +24,12 @@ class QuestionI(admin.TabularInline):
     model = Question
 
 class QuestionnaireMA(admin.ModelAdmin):
-    inlines = [QuestionnaireTweetI, QuestionnaireTitleI, QuestionnaireIntroI, QuestionnaireThankYouI, QuestionI]
+    inlines = [QuestionnaireTweetI, QuestionnaireTitleI, QuestionnaireIntroI, QuestionnaireMoreInfoI, QuestionnaireThankYouI, QuestionI]
 
 admin.site.register(Questionnaire, QuestionnaireMA)
 admin.site.register(QuestionnaireTitle)
 admin.site.register(QuestionnaireIntro)
+admin.site.register(QuestionnaireMoreInfo)
 admin.site.register(QuestionnaireTweet)
 admin.site.register(QuestionnaireThankYou)
 

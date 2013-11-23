@@ -51,6 +51,13 @@ class QuestionnaireIntro(models.Model):
     def __unicode__(self):
         return self.text[:80]
 
+class QuestionnaireMoreInfo(models.Model):
+    questionnaire = models.ForeignKey("Questionnaire", related_name="more_infos")
+    language = models.ForeignKey("Language", related_name="+")
+    text = models.TextField()
+    def __unicode__(self):
+        return self.text[:80]
+
 class QuestionnaireThankYou(models.Model):
     questionnaire = models.ForeignKey("Questionnaire", related_name="thank_yous")
     language = models.ForeignKey("Language", related_name="+")

@@ -47,7 +47,7 @@ def info(request, q_id, language):
     c["q_id"] = q_id
     c["language"] = language
     c["title"] = go4(QuestionnaireTitle, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
-    c["intro"] = go4(QuestionnaireIntro, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
+    c["more_info"] = go4(QuestionnaireMoreInfo, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
     return render_to_response("info.html", c)
     
 def search(request, q_id, language):
@@ -55,7 +55,7 @@ def search(request, q_id, language):
     q = go4(Questionnaire, id=q_id)
     lang = go4(Language, code=language)
     c["q_id"] = q_id
-    c["title"] = go4(QuestionnaireTitle, questionnaire=q, language=lang).text.replace("{{location}}", "[?]")
+    c["title"] = go4(QuestionnaireTitle, questionnaire=q, language=lang).text
     c["language"] = language
     if "query" in request.GET:
         c["query"] = request.GET["query"]
