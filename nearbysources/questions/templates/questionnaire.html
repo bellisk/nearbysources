@@ -29,7 +29,10 @@
             }
         }
     </script>
-    <div id="intro">{{intro}}</div>
+    <div id="intro">
+        {{intro}}<br><br>
+        <a href="{% url "nearbysources.questions.views.info" q_id language %}">&laquo; More info about the {{title}}</a>
+    </div>
     <div id="questions">
         {% for q in questions %}
             <div id="q_{{q.id}}" class="question">

@@ -21,6 +21,7 @@ def questionnaire(request, q_id, l_id, language):
     c["title"] = go4(QuestionnaireTitle, questionnaire=q, language=lang).text.replace("{{location}}", l.name)
     c["intro"] = go4(QuestionnaireIntro, questionnaire=q, language=lang).text.replace("{{location}}", l.name)
     c["questions"] = [{"id": question.id, "text": go4(QuestionText, question=question, language=lang).text, "options": [{"id": option.id, "text": go4(OptionText, option=option, language=lang).text} for option in question.options.all()]} for question in q.questions.all()]
+    c["language"] = language
     return render_to_response("questionnaire.html", c)
 
 @csrf_exempt
