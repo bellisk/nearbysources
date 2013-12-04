@@ -64,14 +64,20 @@ def search(request, q_id, language):
         c["results"] = LocationOfInterest.objects.all()
     return render_to_response("search.html", c)
 
+def grey_if_zero(n):
+    if n == 0:
+        return '<span style="color:grey;">' + str(n) + '</span>'
+    else:
+        return str(n)
+
 def results(request, q_id, language):
     q = go4(Questionnaire, id=q_id)
     lang = go4(Language, code=language)
     c = {}
     c["name"] = q.name
     c["headers"] = [
-        [["", 1], ["", 1]] + [[go4(QuestionText, question=question, language=lang).text, len(question.options.all())] for question in q.questions.order_by("name").all()],
-        [["Location", 1], ["Responses", 1]] + [[go4(OptionText, option=option, language=lang).text, 1] for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]
+        [["", True, 1], ["", True, 1]] + [[go4(QuestionText, question=question, language=lang).text, True, len(question.options.all())] for question in q.questions.order_by("name").all()],
+        [["Location", True, 1], ["Responses", True, 1]] + [[go4(OptionText, option=option, language=lang).text + ", %", option.id == question.options.order_by("name").all()[0].id, 1] for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]
     ]
-    c["data"] = [[loc.name, len(loc.responses.all())] + [str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 / len(Answer.objects.filter(response__location=loc, question=question))) + "%" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()] for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]
+    c["data"] = [[(loc.name, True), (len(loc.responses.all()), True)] + [(grey_if_zero(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question))), option.id == question.options.order_by("name").all()[0].id) for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()] for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]
     return render_to_response("results.html", c)

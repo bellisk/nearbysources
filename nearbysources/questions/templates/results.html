@@ -9,14 +9,19 @@
     th {
         border-left: 1px solid #dddddd;
         text-align: left;
+        padding-left: 3px;
         padding-right: 10px;
         margin: 0;
     }
     td {
         border-top: 1px solid #bbbbbb;
         border-left: 1px solid #dddddd;
+        padding-left: 3px;
         padding-right: 10px;
         text-align: right;
+    }
+    .question_start {
+        border-left: 2px solid #999999;
     }
 </style>{% endblock %}
 
@@ -25,14 +30,14 @@
         {% for row in headers %}
             <tr>
             {% for cell in row %}
-                <th colspan="{{cell.1}}">{{cell.0}}</th>
+                <th {% if cell.1 %}class="question_start"{% endif %} colspan="{{cell.2}}">{{cell.0}}</th>
             {% endfor %}
             </tr>
         {% endfor %}
         {% for row in data %}
             <tr>
             {% for cell in row %}
-                <td>{{cell}}</td>
+                <td {% if cell.1 %}class="question_start"{% endif %}>{{cell.0|safe}}</td>
             {% endfor %}
             </tr>
         {% endfor %}
