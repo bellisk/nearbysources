@@ -8,4 +8,5 @@ urlpatterns = patterns('',
     url(r'^q/([0-9]+)/([a-z-]+)/$', 'nearbysources.questions.views.info'),
     url(r'^q/([0-9]+)/([a-z-]+)/search$', 'nearbysources.questions.views.search'),
     url(r'^q/([0-9]+)/([a-z-]+)/results$', 'nearbysources.questions.views.results'),
+    url(r'^q/([0-9]+)/([a-z-]+)/csvresults.csv$', 'nearbysources.questions.views.csvresults'),
 )

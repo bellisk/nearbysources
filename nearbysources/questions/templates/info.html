@@ -20,5 +20,6 @@
     </div>
     <div>
         <h3><a href="{% url "nearbysources.questions.views.results" q_id language %}">Results</a></h3>
+        <a href="{% url "nearbysources.questions.views.csvresults" q_id language %}">Results as CSV</a>
     </div>
 {% endblock %}

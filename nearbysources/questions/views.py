@@ -81,3 +81,11 @@ def results(request, q_id, language):
     ]
     c["data"] = [[(loc.name, True), (len(loc.responses.all()), True)] + [(grey_if_zero(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question))), option.id == question.options.order_by("name").all()[0].id) for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()] for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]
     return render_to_response("results.html", c)
+
+def csvresults(request, q_id, language):
+    q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    csv_headers = "\t\t" + "\t".join([go4(QuestionText, question=question, language=lang).text + "\t" * (len(question.options.all()) - 1) for question in q.questions.order_by("name").all()]) + "\n" + "Location\tResponses\t" + "\t".join([go4(OptionText, option=option, language=lang).text + ", %" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]) + "\n"
+    csv_data = "\n".join([loc.name + "\t" + str(len(loc.responses.all())) + "\t" + "\t".join([str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question))) for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]) for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0])
+    csv_results = csv_headers + "\n" + csv_data
+    return HttpResponse(csv_results, content_type='text/csv')
