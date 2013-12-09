@@ -88,7 +88,8 @@ def csvresults(request, q_id, language):
     output = StringIO.StringIO()
     csv_writer = csv.writer(output)
     csv_header1 = [u"", u"", u"", u""]
-    [csv_header1.extend([go4(QuestionText, question=question, language=lang).text, "" * (len(question.options.all()) - 1)]) for question in q.questions.order_by("name").all()]
+    for question in q.questions.order_by("name").all():
+        csv_header1.extend([go4(QuestionText, question=question, language=lang).text] + [""] * (len(question.options.all()) - 1)) 
     csv_writer.writerow(csv_header1)
     csv_header2 = [u"Location", u"Latitude", u"Longitude", u"Responses"]
     csv_header2.extend([go4(OptionText, option=option, language=lang).text + ", %" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()])
