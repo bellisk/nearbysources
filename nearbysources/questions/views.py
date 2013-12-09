@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, redirect
 from django.shortcuts import get_object_or_404 as go4
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json, csv, StringIO
 from django.http import HttpResponse
 
 def frontpage(request):
@@ -85,7 +85,19 @@ def results(request, q_id, language):
 def csvresults(request, q_id, language):
     q = go4(Questionnaire, id=q_id)
     lang = go4(Language, code=language)
-    csv_headers = "\t\t" + "\t".join([go4(QuestionText, question=question, language=lang).text + "\t" * (len(question.options.all()) - 1) for question in q.questions.order_by("name").all()]) + "\n" + "Location\tResponses\t" + "\t".join([go4(OptionText, option=option, language=lang).text + ", %" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]) + "\n"
-    csv_data = "\n".join([loc.name + "\t" + str(len(loc.responses.all())) + "\t" + "\t".join([str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question))) for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()]) for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0])
-    csv_results = csv_headers + "\n" + csv_data
-    return HttpResponse(csv_results, content_type='text/csv')
+    output = StringIO.StringIO()
+    csv_writer = csv.writer(output)
+    csv_header1 = [u"", u""]
+    [csv_header1.extend([go4(QuestionText, question=question, language=lang).text, "" * (len(question.options.all()) - 1)]) for question in q.questions.order_by("name").all()]
+    csv_writer.writerow(csv_header1)
+    csv_header2 = [u"Location", u"Responses"]
+    csv_header2.extend([go4(OptionText, option=option, language=lang).text + ", %" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()])
+    csv_writer.writerow(csv_header2)
+    for loc in [loc for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]:
+        csv_line = [loc.name, str(len(loc.responses.all()))]
+        for question in q.questions.order_by("name").all():
+            for option in [option for option in question.options.order_by("name").all()]:
+                csv_line.extend([str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question)))])
+        csv_writer.writerow(csv_line)
+    print output.getvalue()
+    return HttpResponse(output.getvalue(), content_type='text/csv')
