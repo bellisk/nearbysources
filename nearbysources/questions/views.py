@@ -87,17 +87,30 @@ def csvresults(request, q_id, language):
     lang = go4(Language, code=language)
     output = StringIO.StringIO()
     csv_writer = csv.writer(output)
-    csv_header1 = [u"", u""]
+    csv_header1 = [u"", u"", u"", u""]
     [csv_header1.extend([go4(QuestionText, question=question, language=lang).text, "" * (len(question.options.all()) - 1)]) for question in q.questions.order_by("name").all()]
     csv_writer.writerow(csv_header1)
-    csv_header2 = [u"Location", u"Responses"]
+    csv_header2 = [u"Location", u"Latitude", u"Longitude", u"Responses"]
     csv_header2.extend([go4(OptionText, option=option, language=lang).text + ", %" for question in q.questions.order_by("name").all() for option in question.options.order_by("name").all()])
     csv_writer.writerow(csv_header2)
     for loc in [loc for loc in q.campaign.locations.order_by("name").all() if len(loc.responses.all()) > 0]:
-        csv_line = [loc.name, str(len(loc.responses.all()))]
+        csv_line = [loc.name, loc.lng, loc.lat, str(len(loc.responses.all()))]
         for question in q.questions.order_by("name").all():
             for option in [option for option in question.options.order_by("name").all()]:
                 csv_line.extend([str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question)))])
         csv_writer.writerow(csv_line)
-    print output.getvalue()
     return HttpResponse(output.getvalue(), content_type='text/csv')
+
+def jsonresults(request, q_id, language):
+    q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    results_dict = {"Questionnaire": q.name, "Language": lang.name, "Locations": []}
+    for loc in [loc for loc in q.campaign.locations.all() if len(loc.responses.all()) > 0]:
+        questions_dict = {}
+        for question in q.questions.all():
+            questions_dict[go4(QuestionText, question=question, language=lang).text] = {}
+            for option in question.options.all():
+                questions_dict[go4(QuestionText, question=question, language=lang).text][go4(OptionText, option=option, language=lang).text] = len(Answer.objects.filter(response__location=loc, option=option))
+        location_dict = {"Name": loc.name, "Longitude": loc.lng, "Latitude": loc.lat, "No. of responses": len(loc.responses.all()), "Questions": questions_dict}
+        results_dict["Locations"].append(location_dict)
+    return HttpResponse(json.dumps(results_dict), content_type='application/json')
