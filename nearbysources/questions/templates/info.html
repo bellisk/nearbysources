@@ -21,6 +21,8 @@
     <div>
         <h3><a href="{% url "nearbysources.questions.views.results" q_id language %}">Results</a></h3>
         <a href="{% url "nearbysources.questions.views.csvresults" q_id language %}">Results as CSV</a><br>
-        <a href="{% url "nearbysources.questions.views.jsonresults" q_id language %}">Results as JSON</a>
+        <a href="{% url "nearbysources.questions.views.jsonresults" q_id language %}">Results as JSON</a><br>
+        <a href="{% url "nearbysources.questions.views.kmlresults" q_id language %}">Results as KML</a><br>
+        These are live from the database.
     </div>
 {% endblock %}

@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     url(r'^q/([0-9]+)/([a-z-]+)/results$', 'nearbysources.questions.views.results'),
     url(r'^q/([0-9]+)/([a-z-]+)/csvresults.csv$', 'nearbysources.questions.views.csvresults'),
     url(r'^q/([0-9]+)/([a-z-]+)/jsonresults.json$', 'nearbysources.questions.views.jsonresults'),
+    url(r'^q/([0-9]+)/([a-z-]+)/kmlresults.kml$', 'nearbysources.questions.views.kmlresults'),
 )

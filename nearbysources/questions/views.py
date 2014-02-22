@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json, csv, StringIO
 from django.http import HttpResponse
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 def frontpage(request):
     c = {}
@@ -115,3 +116,49 @@ def jsonresults(request, q_id, language):
         location_dict = {"Name": loc.name, "Longitude": loc.lng, "Latitude": loc.lat, "No. of responses": len(loc.responses.all()), "Questions": questions_dict}
         results_dict["Locations"].append(location_dict)
     return HttpResponse(json.dumps(results_dict), content_type='application/json')
+
+def kmlresults(request, q_id, language):
+    q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    kml = Element("kml")
+    kml.set("xmlns", "http://www.opengis.net/kml/2.2")
+    doc = SubElement(kml, "Document")
+    doc_name = SubElement(doc, "name")
+    doc_name.text = go4(QuestionnaireTitle, questionnaire=q, language=lang).text
+    style = SubElement(doc, "Style")
+    style.set("id", "nbs_style")
+    bstyle = SubElement(style, "BalloonStyle")
+    bstyle_text = SubElement(bstyle, "text")
+    t = ""
+    for question in q.questions.order_by("name").all():
+        t += '<div class="question"><div class="question_text" style="font-weight: bold;">'
+        t += go4(QuestionText, question=question, language=lang).text
+        t += '</div><table>'
+        for option in [option for option in question.options.order_by("name").all()]:
+            t += '<tr><td>'
+            t += go4(OptionText, option=option, language=lang).text
+            t += '</td><td>$['
+            t += str(option.id)
+            t += ']%</td></tr>'
+        t += '</table></div>'
+    bstyle_text.text = t
+    for loc in [loc for loc in q.campaign.locations.all() if len(loc.responses.all()) > 0]:
+        pm = SubElement(doc, "Placemark")
+        styleUrl = SubElement(pm, "styleUrl")
+        styleUrl.text = "#nbs_style"
+        name = SubElement(pm, "name")
+        name.text = loc.name
+        pt = SubElement(pm, "Point")
+        coords = SubElement(pt, "coordinates")
+        coords.text = str(loc.lng) + "," + str(loc.lat) + ",0"
+        ed = SubElement(pm, "ExtendedData")
+        for question in q.questions.order_by("name").all():
+            for option in [option for option in question.options.order_by("name").all()]:
+                percentage = str(len(Answer.objects.filter(response__location=loc, option=option)) * 100 // len(Answer.objects.filter(response__location=loc, question=question)))
+                data = SubElement(ed, "Data")
+                data.set("name", str(option.id))
+                display_name = SubElement(data, "displayName")
+                display_name.text = go4(QuestionText, question=question, language=lang).text + " " + go4(OptionText, option=option, language=lang).text
+                value = SubElement(data, "value")
+                value.text = percentage
+    return HttpResponse(tostring(kml), content_type="application/vnd.google-earth.kml+xml")
