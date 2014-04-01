@@ -162,3 +162,29 @@ def kmlresults(request, q_id, language):
                 value = SubElement(data, "value")
                 value.text = percentage
     return HttpResponse(tostring(kml), content_type="application/vnd.google-earth.kml+xml")
+
+def get_all_questions_and_locations(request, q_id, language):
+    q = go4(Questionnaire, id=q_id)
+    lang = go4(Language, code=language)
+    results_dict = {"Questionnaire": q.name, "Language": lang.name, "Questions": [], "Locations": []}
+
+    # Constructing a dictionary with all questions and options in it
+    questions_dict = {}
+    for question in q.questions.all():
+        question_dict = {"ID": question.id, "Text": go4(QuestionText, question=question, language=lang).text, "Options": []}
+        for option in question.options.all():
+            option_dict = {"ID": option.id, "Text": go4(OptionText, option=option, language=lang).text}
+            question_dict["Options"].append(option_dict)
+        results_dict["Questions"].append(question_dict)
+
+    # Constructing a list of all locations, with name + id + lat/lng + results
+    for loc in q.campaign.locations.all():
+        questions_dict = {}
+        for question in q.questions.all():
+            questions_dict[question.id] = {}
+            for option in question.options.all():
+                questions_dict[question.id][option.id] = len(Answer.objects.filter(response__location=loc, option=option))
+        location_dict = {"ID": loc.id, "Name": loc.name, "Longitude": loc.lng, "Latitude": loc.lat, "Questions": questions_dict}
+        results_dict["Locations"].append(location_dict)
+
+    return HttpResponse(json.dumps(results_dict), content_type='application/json')
