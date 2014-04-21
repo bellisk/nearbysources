@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, redirect
 from django.shortcuts import get_object_or_404 as go4
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
-import json, csv, StringIO
+import json, csv, StringIO, math
 from django.http import HttpResponse
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -163,10 +163,10 @@ def kmlresults(request, q_id, language):
                 value.text = percentage
     return HttpResponse(tostring(kml), content_type="application/vnd.google-earth.kml+xml")
 
-def get_all_questions_and_locations(request, q_id, language):
+def get_all_questions_and_locations(request, q_id, language, page):
     q = go4(Questionnaire, id=q_id)
     lang = go4(Language, code=language)
-    results_dict = {"Questionnaire": q.name, "Language": lang.name, "Questions": [], "Locations": []}
+    results_dict = {"Questionnaire": q.name, "Language": lang.name, "Questions": [], "Locations": [], "Pages": 0}
 
     # Constructing a dictionary with all questions and options in it
     questions_dict = {}
@@ -177,8 +177,13 @@ def get_all_questions_and_locations(request, q_id, language):
             question_dict["Options"].append(option_dict)
         results_dict["Questions"].append(question_dict)
 
+    # Pagination: 100 locations at a time
+    start_id = (page - 1) * 100 + 1
+    end_id = page * 100
+    results_dict["Pages"] = math.ceil(len(q.campaign.locations.all()) * page / 100)
+
     # Constructing a list of all locations, with name + id + lat/lng + results
-    for loc in q.campaign.locations.all():
+    for loc in q.campaign.locations.filter(id__range=(start_id, end_id)):
         questions_dict = {}
         for question in q.questions.all():
             questions_dict[question.id] = {}
